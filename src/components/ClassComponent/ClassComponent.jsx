@@ -4,42 +4,62 @@ import PropTypes from 'prop-types';
 
 export class ClassComponent extends React.Component {
   state = {
-    resoult: 'Результат',
+    resoult: `Угадай число в диапозоне 
+    ${this.props.min} - ${this.props.max}`,
     userNumber: '',
     randomNumber:
       Math.floor(Math.random() * this.props.max - this.props.min) +
       this.props.min,
     count: 0,
     buttonTitle: 'Угадать',
+    disabled: false,
+    isGameOver: false,
   };
 
   handleSubmit = e => {
     e.preventDefault();
-    this.setState(state => ({
-      count: state.count + 1,
-    }));
-
     this.setState((state) => {
-      if (!state.userNumber) {
+      if (!state.userNumber && !state.isGameOver) {
         return {
-          resoult: 'Введите число',
+          resoult: `Введите число в диапозоне 
+          ${this.props.min} - ${this.props.max}`,
           buttonTitle: 'Угадать',
+          disabled: false,
         };
       }
 
-      if (state.userNumber > state.randomNumber) {
+      if ((state.userNumber > state.randomNumber) && !state.isGameOver) {
         return {
           resoult: `${state.userNumber} больше загаданного`,
           buttonTitle: 'Угадать',
           userNumber: '',
+          count: state.count + 1,
+          disabled: false,
         };
       }
 
-      if (state.userNumber < state.randomNumber) {
+      if ((state.userNumber < state.randomNumber) && !state.isGameOver) {
         return {
           resoult: `${state.userNumber} меньше загаданного`,
           buttonTitle: 'Угадать',
           userNumber: '',
+          count: state.count + 1,
+          disabled: false,
+        };
+      }
+
+      if (state.isGameOver) {
+        return {
+          resoult: `Угадай число в диапозоне 
+    ${this.props.min} - ${this.props.max}`,
+          buttonTitle: 'Угадать',
+          disabled: false,
+          count: 0,
+          randomNumber:
+      Math.floor(Math.random() * this.props.max - this.props.min) +
+      this.props.min,
+          userNumber: '',
+          isGameOver: false,
         };
       }
 
@@ -48,10 +68,8 @@ export class ClassComponent extends React.Component {
         попыток ${state.count}`,
         userNumber: '',
         buttonTitle: 'Сыграть ещё',
-        count: 0,
-        randomNumber:
-      Math.floor(Math.random() * this.props.max - this.props.min) +
-      this.props.min,
+        disabled: !state.disabled,
+        isGameOver: true,
       };
     });
   };
@@ -75,7 +93,8 @@ export class ClassComponent extends React.Component {
           </label>
 
           <input className={style.input} type='number' id='user_number'
-            onChange={this.handleChange} value={this.state.userNumber} />
+            onChange={this.handleChange} value={this.state.userNumber}
+            disabled={this.state.disabled}/>
 
           <button className={style.btn}>{this.state.buttonTitle}</button>
         </form>
